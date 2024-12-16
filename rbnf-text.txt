@@ -1,0 +1,75 @@
+program_name = "StartProgram" ;
+start_block = "StartBlok" ;
+end_block = "EndBlok" ;
+variable_declaration = "Variable", ident, { ",", ident }, ":" , "Int32" ;
+input_operation = "Scan", "(", ident_write, ")" ;
+output_operation = "Print", "(", low_priority_expression, ")" ;
+
+if_expression = low_priority_expression ;
+body_for_true = "then" , { statement } , ";" ;
+body_for_false = "else" , { statement } , ";" ;
+if_condition = "If", if_expression, body_for_true, body_for_false ;
+
+cycle_begin_expression = low_priority_expression ;
+cycle_counter = ident ;
+cycle_counter_last_value = value ;
+cycle_body = "do" , statement , { statement } ;
+
+for_to_cycle = "For", cycle_counter, "=", cycle_counter_last_value, "To", cycle_begin_expression, cycle_body, ";" ;
+for_downto_cycle = "For", cycle_counter, "=", cycle_counter_last_value, "Downto", cycle_begin_expression, cycle_body, ";" ;
+
+while_cycle_head_expression = low_priority_expression ;
+while_cycle = "While", while_cycle_head_expression, { statement } , ";" ;
+
+tokenCONTINUE = "continue" ;
+tokenWHILE = "while" ;
+tokenEXIT = "exit" ;
+continue_while = tokenCONTINUE , tokenWHILE ;
+exit_while = tokenEXIT , tokenWHILE ;
+statement_in_while_body = statement | continue_while | exit_while ;
+
+repeat_until_cycle_cond = low_priority_expression ;
+repeat_until_cycle = "Repeat", { statement }, "Until", repeat_until_cycle_cond ;
+
+low_priority_expression = middle_priority_expression, { low_priority_action } ;
+middle_priority_expression = high_priority_expression, { middle_priority_action } ;
+high_priority_expression = base_expression, { high_priority_action } ;
+base_expression = "(", low_priority_expression, ")" | value | ident ;
+
+low_priority_action = "Ls" | "Gr" | "Eq" | "Neq" ;
+middle_priority_action = "And" | "Or" ;
+high_priority_action = "++" | "--" | "**" | "Div" | "Mod" ;
+
+operation_not = "Not", inseparable_expression ;
+and_action = "And", inseparable_expression ;
+or_action = "Or", high_priority_expression ;
+equal_action = "Eq", middle_priority_expression ;
+not_equal_action = "Neq", middle_priority_expression ;
+less_or_equal_action = "Ls", middle_priority_expression ;
+greater_or_equal_action = "Gr", middle_priority_expression ;
+add_action = "++", high_priority_expression ;
+sub_action = "--", high_priority_expression ;
+mul_action = "**", inseparable_expression ;
+div_action = "Div", inseparable_expression ;
+mod_action = "Mod", inseparable_expression ;
+
+unary_operation = operation_not ;
+inseparable_expression = group_expression | unary_operation | ident_read | value_read ;
+
+group_expression = "(" , low_priority_expression , ")" ;
+bind = ident_write , "==>", low_priority_expression  ;
+
+statement = variable_declaration | input_operation | output_operation | if_condition | for_to_cycle | for_downto_cycle | while_cycle | repeat_until_cycle ;
+
+digit = "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+non_zero_digit = "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" ;
+unsigned_value = (non_zero_digit , { digit } | "0") ;
+value = [ sign ], unsigned_value ;
+
+sign = "+" | "-" ;
+
+letter_in_lower_case = "a" | "b" | "c" | "d" | "e" | "f" | "g" | "h" | "i" | "j" | "k" | "l" | "m" | "n" | "o" | "p" | "q" | "r" | "s" | "t" | "u" | "v" | "w" | "x" | "y" | "z" ;
+letter_in_upper_case = "A" | "B" | "C" | "D" | "E" | "F" | "G" | "H" | "I" | "J" | "K" | "L" | "M" | "N" | "O" | "P" | "Q" | "R" | "S" | "T" | "U" | "V" | "W" | "X" | "Y" | "Z" ;
+ident = "Up-Low", letter_in_upper_case, { letter_in_lower_case } | "Low-Up6", "_", { letter_in_upper_case } ;
+
+program = program_name, start_block, { statement }, end_block ;
